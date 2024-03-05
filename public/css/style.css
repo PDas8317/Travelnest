@@ -1,0 +1,108 @@
+body {
+    background-color: rgb(182, 240, 179) !important;
+}
+
+
+/* Navbar */
+.container-fluid {
+    width: 100%;
+}
+
+.navbar {
+    height: 5rem;
+}
+
+.fa-globe {
+    color: blue;
+    font-size: 2rem;
+}
+
+.nav-link {
+    color: black !important;
+}
+
+
+/* Footer */
+
+.links a {
+    color: black !important;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.links,
+.socials {
+    width: 100%;
+}
+
+
+.socials i {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.footerBox {
+    text-align: center;
+    height: 8rem;
+    background-color: rgb(212, 221, 231);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cards */
+.card {
+    border: none !important;
+    margin-bottom: 2rem;
+    margin-right: 1rem !important;
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+    background-color: rgb(182, 240, 179) !important;
+
+}
+
+.card-img-top {
+    border: 2px solid black;
+    border-radius: 1rem !important;
+}
+
+.card-body {
+    padding: 0 !important;
+
+}
+
+.main {
+    /* flex: 1; */
+    margin-left: 4rem;
+
+}
+
+.show-img {
+    height: 40vh;
+}
+
+
+.btn-delete {
+    background-color: red;
+}
+
+.reviewCard {
+    border: 2px solid black !important;
+    margin-bottom: 0.3rem;
+    margin-right: 0.3rem;
+}
+
+
+.sl {
+    margin-inline-start: auto;
+}
+
+/* Map */
+#map {
+    height: 400px;
+    width: 80vh;
+    /* background-color: black; */
+}
