@@ -4,8 +4,6 @@ if (process.env.NODE_ENV != "production") {
 
 
 
-
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -44,8 +42,8 @@ main()
 
 
 async function main() {
-    // await mongoose.connect("mongodb://127.0.0.1:27017/WanderDest");
-    await mongoose.connect(dbUrl);
+    await mongoose.connect("mongodb://127.0.0.1:27017/WanderDest");
+    // await mongoose.connect(dbUrl);
 }
 
 app.set("view engine", "ejs");
@@ -58,20 +56,23 @@ app.engine("ejs", ejsMate);
 
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
+    mongoUrl: "mongodb://127.0.0.1:27017/WanderDest",
+    // mongoUrl: dbUrl,
+
     crypto: {
-        secret: process.env.SECRET,
+        // secret: process.env.SECRET,
+        secret: "supersecret",
     },
     touchAfter: 24 * 3600,
 })
 
-store.on("error", (err) => {
-    console.log("Error in mongo session store", err);
+store.on("error", () => {
+    console.log("Error in mongo session store");
 })
 
 const sessionOptions = {
     store,
-    secret: process.env.SECRET,
+    secret: "supersecret",
     resave: false,
     saveUninitialized: true,
     cookie: {

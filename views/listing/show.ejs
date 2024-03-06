@@ -1,18 +1,18 @@
 <% layout('/layouts/boilerplate') %>
-
     <script>
         const mapToken = "<%= process.env.MAP_TOKEN%>";
-        const showlist = <% - JSON.stringify(showList) %>
+
     </script>
 
 
-
     <div class="row ">
-        <div class="col-5 offset-3">6
+        <div class="col-5 offset-3">
 
             <div class="card">
                 <b class="card-text">
                     <h2>
+
+
                         <%=showList.title %>
                     </h2>
                 </b>
@@ -21,32 +21,31 @@
                 <div class="card-body">
                     <p class="card-text">
 
+                    <h3>Owner :
+                        <%= showList.owner.username %>
+                    </h3>
 
-                        <!-- <h3>Owner :
-                            showList.owner.username
-                        </h3> -->
 
+                    <%=showList.description %>
 
-                        <%=showList.description %>
+                        <br>
+
+                        <b>&#8377;
+                            <%=showList.price %>
+                        </b>
+
+                        <br>
+
+                        <%=showList.location %>
 
                             <br>
 
-                            <b>&#8377;
-                                <%=showList.price %>
-                            </b>
-
-                            <br>
-
-                            <%=showList.location %>
+                            <%=showList.country %>
 
                                 <br>
 
-                                <%=showList.country %>
 
-                                    <br>
-
-
-                    </p>
+                                </p>
 
 
                 </div>
@@ -151,6 +150,9 @@
                         <% } %>
                 </div>
                 <% } %>
+
+
+
                     <div class="col-6 offset-3 mb-3">
                         <h3>Where you'll be</h3>
                         <div id="map"></div>

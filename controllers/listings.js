@@ -1,5 +1,6 @@
 const Listing = require("../models/listing.js");
 const ExpressError = require("../utils/ExpressError.js");
+
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
@@ -26,7 +27,7 @@ module.exports.showListing = async (req, res) => {
                 path: "author",
             }
         }).populate("owner");
-    // console.log(showList);
+    console.log(showList);
 
     if (!showList) {
         req.flash("error", "Does not exist this listing");
@@ -42,6 +43,7 @@ module.exports.createListing = async (req, res) => {
 
     let response = await geocodingClient.forwardGeocode({
         query: req.body.listing.location,
+        // query: "New Delhi, india",
         limit: 1,
     })
         .send()
