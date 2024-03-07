@@ -31,19 +31,20 @@ const User = require("./models/user.js");
 
 
 const dbUrl = process.env.ATLASDB_URL;
+console.log(dbUrl);
 
 main()
     .then(() => {
         console.log("connected");
     })
     .catch((err) => {
-        console.log("error occurred");
+        console.log("error occurred", err);
     })
 
 
 async function main() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/WanderDest");
-    // await mongoose.connect(dbUrl);
+    await mongoose.connect(dbUrl);
+    // await mongoose.connect("mongodb://127.0.0.1:27017/WanderDest");
 }
 
 app.set("view engine", "ejs");
@@ -56,15 +57,16 @@ app.engine("ejs", ejsMate);
 
 
 const store = MongoStore.create({
-    mongoUrl: "mongodb://127.0.0.1:27017/WanderDest",
-    // mongoUrl: dbUrl,
+    // mongoUrl: "mongodb://127.0.0.1:27017/WanderDest",
 
+    mongoUrl: dbUrl,
     crypto: {
-        // secret: process.env.SECRET,
-        secret: "supersecret",
+        secret: process.env.SECRET,
+        // secret: "supersecret",
     },
     touchAfter: 24 * 3600,
 })
+
 
 store.on("error", () => {
     console.log("Error in mongo session store");
@@ -72,7 +74,7 @@ store.on("error", () => {
 
 const sessionOptions = {
     store,
-    secret: "supersecret",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -206,15 +208,15 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get("/demouser", async (req, res) => {
-    let fakeUser = new User({
-        email: "random@gmail.com",
-        username: "random"
-    })
+// app.get("/demouser", async (req, res) => {
+//     let fakeUser = new User({
+//         email: "random@gmail.com",
+//         username: "random"
+//     })
 
-    let registeredUser = await User.register(fakeUser, "random");
-    res.send(registeredUser);
-})
+//     let registeredUser = await User.register(fakeUser, "random");
+//     res.send(registeredUser);
+// })
 
 
 
