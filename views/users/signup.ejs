@@ -1,31 +1,305 @@
 <% layout('/layouts/boilerplate') %>
-    <div class="row">
-        <div class="col-6 offset-3 ">
-            <form class="needs-validation" action="/signup" method="post" novalidate>
 
-                <div class="mb-3">
-                    <h2>Signup for WanderDest</h2>
-                </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input name="username" id="username" type="text" class="form-control" required>
-                    <div class="valid-feedback"></div>
+    <style>
+        /* Root colors for light/dark mode */
+        :root {
+            --bg-light: #f7f9fc;
+            --bg-dark: #1a202c;
+            --form-bg-light: #ffffff;
+            --form-bg-dark: #2d3748;
+            --input-bg-light: #f0f4f8;
+            --input-bg-dark: #4a5568;
+            --input-border-light: #cbd5e0;
+            --input-border-dark: #718096;
+            --text-light: #2d3748;
+            --text-dark: #e2e8f0;
+            --btn-gradient-start: #00b09b;
+            --btn-gradient-end: #96c93d;
+            --btn-hover-gradient-start: #96c93d;
+            --btn-hover-gradient-end: #00b09b;
+            --shadow-light: rgba(0, 176, 155, 0.3);
+            --shadow-dark: rgba(105, 105, 105, 0.6);
+        }
 
-                </div>
+        /* Body and background */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input name="email" id="email" type="text" class="form-control" required>
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
 
-                </div>
+        /* Form container */
+        .form-container {
+            max-width: 480px;
+            margin: 5rem auto;
+            background-color: var(--form-bg-light);
+            border-radius: 1rem;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 12px 30px var(--shadow-light);
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+        }
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input name="password" id="password" type="password" class="form-control" required>
+        body.dark-mode .form-container {
+            background-color: var(--form-bg-dark);
+            box-shadow: 0 12px 30px var(--shadow-dark);
+        }
 
-                </div>
-                <button class=" btn btn-success">SignUp</button>
-                <br><br>
-            </form>
-        </div>
+        /* Heading */
+        h2 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--btn-gradient-start);
+        }
+
+        body.dark-mode h2 {
+            color: var(--btn-gradient-end);
+        }
+
+        /* Labels */
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: var(--text-light);
+        }
+
+        body.dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        /* Inputs */
+        .form-control {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 1rem;
+            border-radius: 0.6rem;
+            border: 2px solid var(--input-border-light);
+            background-color: var(--input-bg-light);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, color 0.4s ease;
+            outline-offset: 2px;
+        }
+
+        body.dark-mode .form-control {
+            border-color: var(--input-border-dark);
+            background-color: var(--input-bg-dark);
+            color: var(--text-dark);
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+        .form-control:focus {
+            border-color: var(--btn-gradient-start);
+            box-shadow: 0 0 12px var(--btn-gradient-start);
+            background-color: var(--input-bg-light);
+            color: var(--text-light);
+        }
+
+        body.dark-mode .form-control:focus {
+            border-color: var(--btn-gradient-end);
+            box-shadow: 0 0 12px var(--btn-gradient-end);
+            background-color: var(--input-bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Submit button */
+        .btn-success {
+            width: 100%;
+            padding: 0.85rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 1.2rem;
+            border: none;
+            cursor: pointer;
+            background-image: linear-gradient(45deg, var(--btn-gradient-start), var(--btn-gradient-end));
+            color: white;
+            box-shadow: 0 8px 20px var(--btn-gradient-start);
+            transition: background-image 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .btn-success:hover {
+            background-image: linear-gradient(45deg, var(--btn-hover-gradient-start), var(--btn-hover-gradient-end));
+            box-shadow: 0 10px 28px var(--btn-hover-gradient-end);
+        }
+
+        /* Alerts */
+        .alert {
+            margin-top: 1.5rem;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .alert-danger {
+            background-color: #f56565;
+            color: white;
+            border: 1px solid #c53030;
+            box-shadow: 0 0 8px #c53030;
+        }
+
+        .alert-success {
+            background-color: #48bb78;
+            color: white;
+            border: 1px solid #2f855a;
+            box-shadow: 0 0 8px #2f855a;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Dark mode toggle */
+        #darkModeToggle {
+            position: fixed;
+            top: 1.2rem;
+            right: 1.5rem;
+            background: transparent;
+            border: 2px solid var(--btn-gradient-start);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            color: var(--btn-gradient-start);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        body.dark-mode #darkModeToggle {
+            border-color: var(--btn-gradient-end);
+            color: var(--btn-gradient-end);
+        }
+
+        #darkModeToggle:hover {
+            background-color: var(--btn-gradient-start);
+            color: white;
+        }
+
+        body.dark-mode #darkModeToggle:hover {
+            background-color: var(--btn-gradient-end);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .form-container {
+                margin: 3rem 1rem;
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">🌙</button>
+
+    <div class="form-container shadow-lg">
+        <% if (error && error.length> 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= error[0] %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% } %>
+
+                <% if (success && success.length> 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <%= success[0] %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+
+                        <form class="needs-validation" action="/signup" method="post" novalidate>
+                            <h2>Signup for TravelNest</h2>
+
+                            <label for="username" class="form-label">Username</label>
+                            <input name="username" id="username" type="text" class="form-control"
+                                placeholder="Enter username" required>
+                            <div class="invalid-feedback">Please enter your username.</div>
+
+                            <label for="email" class="form-label mt-3">Email</label>
+                            <input name="email" id="email" type="email" class="form-control" placeholder="Enter email"
+                                required>
+                            <div class="invalid-feedback">Please enter a valid email.</div>
+
+                            <label for="password" class="form-label mt-3">Password</label>
+                            <input name="password" id="password" type="password" class="form-control"
+                                placeholder="Enter password" required minlength="6">
+                            <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+
+                            <label for="pin" class="form-label mt-3">Bank PIN (4-digit)</label>
+                            <input type="password" id="pin" name="pin" class="form-control"
+                                placeholder="Enter 4-digit PIN" required pattern="\d{4}" maxlength="4"
+                                title="PIN must be exactly 4 digits">
+                            <div class="invalid-feedback">Please enter a valid 4-digit PIN.</div>
+
+                            <button class="btn btn-success mt-4" type="submit">Sign Up</button>
+                        </form>
     </div>
+
+    <script>
+        // Bootstrap form validation script
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Dark mode toggle
+        const toggleBtn = document.getElementById('darkModeToggle');
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                toggleBtn.textContent = '🌞'; // sun icon for dark mode
+                localStorage.setItem('mode', 'dark');
+            } else {
+                toggleBtn.textContent = '🌙'; // moon icon for light mode
+                localStorage.setItem('mode', 'light');
+            }
+        });
+
+        // Preserve mode on reload
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('mode') === 'dark') {
+                document.body.classList.add('dark-mode');
+                toggleBtn.textContent = '🌞';
+            }
+        });
+
+
+
+        const pinInput = document.getElementById('pin');
+
+        pinInput.addEventListener('input', () => {
+            // Remove any non-digit character
+            pinInput.value = pinInput.value.replace(/\D/g, '');
+
+            // Limit to 4 characters max
+            if (pinInput.value.length > 4) {
+                pinInput.value = pinInput.value.slice(0, 4);
+            }
+        });
+
+    </script>

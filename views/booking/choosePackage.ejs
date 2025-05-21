@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Your Stay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: linear-gradient(to bottom right, #1e1e2f, #2c2c3f);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .listing-img {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .listing-img img {
+            max-width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        form {
+            display: grid;
+            gap: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffffaa;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #d1d1d1;
+        }
+
+        input,
+        select {
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #555;
+            border-radius: 10px;
+            background-color: #1a1a2e;
+            color: #f0f0f0;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 8px #00ffff80;
+            outline: none;
+        }
+
+        input[readonly] {
+            background-color: #2c2c3f;
+            color: #ccc;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00bcd4, #1de9b6);
+            color: #000;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="listing-img">
+            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" />
+        </div>
+
+        <form action="/booking/<%= listing._id %>/book" method="POST" novalidate>
+            <h2>Book Your Stay</h2>
+
+            <label for="packageType">Choose Package</label>
+            <select name="packageType" id="packageType" required>
+                <option value="silver" <%=selectedPackage==='silver' ? 'selected' : '' %>>Silver</option>
+                <option value="gold" <%=selectedPackage==='gold' ? 'selected' : '' %>>Gold</option>
+                <option value="platinum" <%=selectedPackage==='platinum' ? 'selected' : '' %>>Platinum</option>
+            </select>
+
+            <div class="row">
+                <div>
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required />
+                </div>
+                <div>
+                    <label for="phone">Phone (10 digits)</label>
+                    <input type="tel" id="phone" name="phone" pattern="\d{10}" required />
+                </div>
+            </div>
+
+            <label for="location">Your Location</label>
+            <input type="text" id="location" name="location" required />
+
+            <div class="row">
+                <div>
+                    <label for="adults">Adults</label>
+                    <input type="number" id="adults" name="adults" min="0" value="1" />
+                </div>
+                <div>
+                    <label for="children">Children</label>
+                    <input type="number" id="children" name="children" min="0" value="0" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="checkin">Check-in Date</label>
+                    <input type="text" id="checkin" name="checkin" required />
+                </div>
+                <div>
+                    <label for="checkout">Check-out Date</label>
+                    <input type="text" id="checkout" name="checkout" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="duration">Stay Duration (days)</label>
+                    <input type="number" id="duration" name="duration" readonly />
+                </div>
+                <div>
+                    <label for="totalPrice">Total Price ($)</label>
+                    <input type="number" id="totalPrice" name="totalPrice" readonly />
+                </div>
+            </div>
+
+            <input type="hidden" id="bookedDates" value='<%- JSON.stringify(bookedDates || {}) %>' />
+
+            <button type="submit">Book Now</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        const bookedDatesByPackage = JSON.parse(document.getElementById('bookedDates').value || '{}');
+        const packageSelect = document.getElementById('packageType');
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+        const duration = document.getElementById('duration');
+        const totalPrice = document.getElementById('totalPrice');
+        const adultsInput = document.getElementById('adults');
+        const childrenInput = document.getElementById('children');
+
+        const packagePrices = {
+            silver: { adult: 100, child: 50 },
+            gold: { adult: 150, child: 75 },
+            platinum: { adult: 200, child: 100 }
+        };
+
+        let checkinPicker = null;
+        let checkoutPicker = null;
+
+        function getDisabledDates(pkg) {
+            return (bookedDatesByPackage[pkg] || []).map(date => date.trim());
+        }
+
+        function calculateDurationAndPrice() {
+            const start = checkinInput.value;
+            const end = checkoutInput.value;
+            if (!start || !end) return;
+
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            const diffDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+
+            if (diffDays <= 0 || diffDays > 30) {
+                duration.value = '';
+                totalPrice.value = '';
+                return;
+            }
+
+            duration.value = diffDays;
+            const pkg = packageSelect.value;
+            const adults = parseInt(adultsInput?.value || 0);
+            const children = parseInt(childrenInput?.value || 0);
+            const price = (adults * packagePrices[pkg].adult + children * packagePrices[pkg].child) * diffDays;
+            totalPrice.value = price.toFixed(2);
+        }
+
+        function setupFlatpickrs(pkg) {
+            const disabledDates = getDisabledDates(pkg);
+
+            if (checkinPicker) checkinPicker.destroy();
+            if (checkoutPicker) checkoutPicker.destroy();
+
+            checkinPicker = flatpickr(checkinInput, {
+                altInput: true,
+                altFormat: "F j, Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: disabledDates,
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        const minCheckout = new Date(selectedDates[0].getTime() + 24 * 60 * 60 * 1000);
+                        checkoutPicker.set("minDate", minCheckout);
+                    }
+                    calculateDurationAndPrice();
+                }
+            });
+
+            checkoutPicker = flatpickr(checkoutInput, {
+                altInput: true,
+                altFormat: "F j, Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: disabledDates,
+                onChange: calculateDurationAndPrice
+            });
+        }
+
+        // Initial setup
+        setupFlatpickrs(packageSelect.value);
+
+        packageSelect.addEventListener('change', () => {
+            setupFlatpickrs(packageSelect.value);
+            checkinInput.value = '';
+            checkoutInput.value = '';
+            duration.value = '';
+            totalPrice.value = '';
+        });
+
+        if (adultsInput && childrenInput) {
+            adultsInput.addEventListener('input', calculateDurationAndPrice);
+            childrenInput.addEventListener('input', calculateDurationAndPrice);
+        }
+    </script>
+</body>
+
+</html>

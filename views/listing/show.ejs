@@ -1,8 +1,17 @@
 <% layout('/layouts/boilerplate') %>
-    <script>
-        const mapToken = "<%= process.env.MAP_TOKEN%>";
 
-    </script>
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 
 
     <div class="row ">
@@ -11,8 +20,6 @@
             <div class="card">
                 <b class="card-text">
                     <h2>
-
-
                         <%=showList.title %>
                     </h2>
                 </b>
@@ -22,7 +29,14 @@
                     <p class="card-text">
 
                     <h3>Owner :
-                        <%= showList.owner.username %>
+                        <% if (showList.owner) { %>
+                            <p>
+                                <%= showList.owner.username %>
+                            </p>
+                            <% } else { %>
+                                <p>Owner information not available</p>
+                                <% } %>
+
                     </h3>
 
 
@@ -46,6 +60,19 @@
 
 
                                 </p>
+                                <!-- Add the "Book Now" button -->
+                                <% if (currUser) { %>
+                                    <!-- <form method="get" action="/listing/<%= showList._id %>/book">
+                                        <button class="btn btn-primary">Book Now</button>
+                                    </form> -->
+                                    <form method="get" action="/booking/<%= showList._id %>/book">
+                                        <button class="btn btn-primary">Book Now</button>
+                                    </form>
+
+
+                                    <% } else { %>
+                                        <p><a href="/login">Log in to book</a></p>
+                                        <% } %>
 
 
                 </div>
@@ -62,7 +89,7 @@
         </form>
         &nbsp;&nbsp;
         <form method="post" action="/listing/<%= showList._id %>?_method=DELETE">
-            <button class="btn btn-delete"><b>DELETE</b></button>
+            <button class="btn btn-danger"><b>DELETE</b></button>
         </form>
     </div>
 
@@ -75,12 +102,7 @@
         <h3 class="offset-3">Leave a review</h3>
         <form class="needs-validation" novalidate method="post" action="/listing/<%= showList._id%>/reviews">
 
-            <!-- <div class="row offset-3">
 
-                    <label for="rating" class="form-label">Rating</label>
-                    <input name="review[rating]" type="range" class="form-range" min="1" max="5" id="rating">
-
-                </div> -->
 
             <div class="mb-3 mt-3 offset-3">
                 <label for="rating" class="form-label">Rating</label>
@@ -101,15 +123,14 @@
             </div>
 
 
-
-            <div class="row offset-3 mb-3">
+            <div class="offset-3 mb-3">
                 <label for="comment" class="form-label"></label>
-                <textarea class="form-control col-6" name="review[comment]" id="comment" placeholder="Write review"
+                <textarea class="form-control col-6 " name="review[comment]" id="comment" placeholder="Write review"
                     cols="20" rows="3" required></textarea>
                 <div class="invalid-feedback">*required</div>
             </div>
 
-            <div class="row offset-3">
+            <div class="offset-3">
                 <button class="btn btn-primary">SUBMIT</button>
             </div>
 
@@ -127,7 +148,11 @@
                             <div class="card-body">
                                 <div class="card-text">
                                     <h5>
-                                        <%= review.author.username%>
+                                        <% if (review.author && review.author.username) { %>
+                                            <%= review.author.username %>
+                                                <% } else { %>
+                                                    <i>Anonymous</i>
+                                                    <% } %>
                                     </h5>
 
                                     <p class="starability-result card-text" data-rating="<%= review.rating%>"></p>
@@ -153,12 +178,14 @@
 
 
 
-                    <div class="col-6 offset-3 mb-3">
-                        <h3>Where you'll be</h3>
-                        <div id="map"></div>
+                    <div class="col-8 offset-2 mb-5">
+                        <div class="card shadow-sm border-0 p-4">
+                            <h3 class="mb-3">🌍 Where You'll Be</h3>
+                            <div id="map"></div>
+                        </div>
                     </div>
 
 
 
+
                     <br>
-                    <script src="/js/map.js"></script>

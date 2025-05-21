@@ -26,7 +26,7 @@ module.exports.createReview = async (req, res) => {
 module.exports.deleteReview = async (req, res) => {
     let { id, reviewId } = req.params;
 
-    //mongoose pull method
+    // //mongoose pull method
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
     await Review.findByIdAndDelete(reviewId);
 

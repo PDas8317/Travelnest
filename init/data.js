@@ -1,3 +1,4 @@
+// // // // // // // // // // // // // // // in init data.js
 const sampleListings = [
     {
         title: "Cozy Beachfront Cottage",
@@ -12,6 +13,7 @@ const sampleListings = [
         price: 1500,
         location: "Malibu",
         country: "United States",
+
     },
     {
         title: "Modern Loft in Downtown",
@@ -22,7 +24,7 @@ const sampleListings = [
             filename: "listingimage",
             url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
         },
-        // "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+
 
         price: 1200,
         location: "New York City",
@@ -390,8 +392,8 @@ const sampleListings = [
             "Indulge in luxury in this overwater villa in the Maldives with stunning views of the Indian Ocean.",
         image:
         {
-            filename: "listingimage",
             url: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bGFrZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+            filename: "listingimage",
         },
         // "https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bGFrZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
 
@@ -432,3 +434,5 @@ const sampleListings = [
 ];
 
 module.exports = { data: sampleListings };
+
+console.log('Data saved to database');

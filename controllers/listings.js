@@ -1,113 +1,243 @@
+
+
+
+
+
+
+
+
+
+
+
+
+// // // controllers listing.js
 const Listing = require("../models/listing.js");
 const ExpressError = require("../utils/ExpressError.js");
 
-const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const mapToken = process.env.MAP_TOKEN;
-const geocodingClient = mbxGeocoding({ accessToken: mapToken });
-
-
-
-
-
+// Fetch all listings
 module.exports.index = async (req, res) => {
-    let allListing = await Listing.find();
-    res.render("listing/index.ejs", { allListing });
-}
+    try {
+        let allListing = await Listing.find();
+        // console.log("Fetched Listings: ", allListing);
+        res.render("listing/index", { allListing });
+    } catch (e) {
+        req.flash("error", "Failed to fetch listings.");
+        res.redirect("/");
+    }
+};
 
-module.exports.renderNewForm = (req, res) => {
-    res.render("listing/new.ejs");
-}
+
+
 
 module.exports.showListing = async (req, res) => {
-    let { id } = req.params;
-    let showList = await Listing.findById(id)
+    const { id } = req.params;
+
+    // Add this log to check the value of the id
+    // console.log("Listing ID: ", id);  // This will log the ID parameter from the URL
+
+    const listing = await Listing.findById(id)
         .populate({
             path: "reviews",
             populate: {
-                path: "author",
+                path: "author"
             }
-        }).populate("owner");
-    console.log(showList);
+        })
+        .populate("owner");
 
-    if (!showList) {
-        req.flash("error", "Does not exist this listing");
-        res.redirect("/listing");
+    if (!listing) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/listing");
     }
-    res.render("listing/show.ejs", { showList });
-}
 
-
-module.exports.createListing = async (req, res) => {
-    // let result = listingSchema.validate(req.body);
-    // console.log(result);
-
-    let response = await geocodingClient.forwardGeocode({
-        query: req.body.listing.location,
-        // query: "New Delhi, india",
-        limit: 1,
-    })
-        .send()
-
-    // console.log(response.body.features[0].geometry);
-    // res.send("DONE");
-
-
-    let url = req.file.path;
-    let filename = req.file.filename;
-    // console.log(url, ">>>>>>>", filename);
-
-
-    let newList = new Listing(req.body.listing);
-    newList.owner = req.user._id;
-    newList.image = { url, filename };
-    newList.geometry = response.body.features[0].geometry;
-    // console.log(newList);
-    let saveListing = await newList.save();
-    console.log(saveListing);
-
-    req.flash("success", "New listing is created");
-    res.redirect("/listing");
-}
+    res.render("listing/show", { showList: listing });
+};
 
 
 
+// Render the new listing form
+module.exports.renderNewForm = (req, res) => {
+    res.render("listing/new");
+};
 
+// // // // // // // // // // // // // Create a new listing
+// // // // // // // // // // module.exports.createListing = async (req, res, next) => {
+// // // // // // // // // //     try {
+// // // // // // // // // //         console.log("Authenticated user:", req.user); // Log the authenticated user
+
+// // // // // // // // // //         if (!req.user || !req.user._id) {
+// // // // // // // // // //             req.flash("error", "You must be logged in to create a listing");
+// // // // // // // // // //             return res.redirect("/login");
+// // // // // // // // // //         }
+
+// // // // // // // // // //         // Log form data
+// // // // // // // // // //         console.log("Form Body:", req.body);
+
+// // // // // // // // // //         const newListing = new Listing(req.body.listing);
+
+// // // // // // // // // //         // Ensure owner is set correctly
+// // // // // // // // // //         if (req.user && req.user._id) {
+// // // // // // // // // //             newListing.owner = req.user._id;
+// // // // // // // // // //         } else {
+// // // // // // // // // //             console.log("Error: User is not authenticated.");
+// // // // // // // // // //             req.flash("error", "User not authenticated");
+// // // // // // // // // //             return res.redirect("/login");
+// // // // // // // // // //         }
+
+// // // // // // // // // //         // If there's an uploaded file, save it to Cloudinary
+// // // // // // // // // //         if (req.file) {
+// // // // // // // // // //             newListing.image = {
+// // // // // // // // // //                 url: req.file.path,
+// // // // // // // // // //                 filename: req.file.filename,
+// // // // // // // // // //             };
+// // // // // // // // // //         }
+
+// // // // // // // // // //         console.log("New Listing Before Save: ", newListing); // Check if owner is set
+
+// // // // // // // // // //         await newListing.save(); // Save the listing
+
+// // // // // // // // // //         req.flash("success", "New listing created!");
+// // // // // // // // // //         res.redirect(`/listing/${newListing._id}`);
+// // // // // // // // // //     } catch (e) {
+// // // // // // // // // //         next(e);
+// // // // // // // // // //     }
+// // // // // // // // // // };
+
+
+module.exports.createListing = async (req, res, next) => {
+    try {
+        console.log("Authenticated user:", req.user); // Log the authenticated user
+
+        if (!req.user || !req.user._id) {
+            req.flash("error", "You must be logged in to create a listing");
+            return res.redirect("/login");
+        }
+
+        console.log("Form Body:", req.body);
+
+        const newListing = new Listing(req.body.listing);
+
+        // Set owner
+        newListing.owner = req.user._id;
+
+
+
+        // Handle uploaded image if any
+        if (req.file) {
+            newListing.image = {
+                url: req.file.path,
+                filename: req.file.filename,
+            };
+        }
+
+        console.log("New Listing Before Save: ", newListing);
+
+        await newListing.save();
+
+        req.flash("success", "New listing created!");
+        res.redirect(`/listing/${newListing._id}`);
+    } catch (e) {
+        next(e);
+    }
+};
+
+
+
+
+// // // // module.exports.createListing = async (req, res, next) => {
+// // // //     try {
+// // // //         const newListing = new Listing(req.body.listing);
+// // // //         newListing.owner = req.user._id;  // Assuming you're using user authentication
+// // // //         await newListing.save();
+
+// // // //         req.flash("success", "New listing created!");
+// // // //         res.redirect(`/listing/${newListing._id}`);  // Correct redirect after saving the listing
+// // // //     } catch (e) {
+// // // //         next(e);
+// // // //     }
+// // // // };
+
+// Render the edit form for a specific listing
 module.exports.renderEditForm = async (req, res) => {
-    let { id } = req.params;
-    let editList = await Listing.findById(id);
-    // console.log(editList);
+    const { id } = req.params;
+    console.log("✅ HIT EDIT ROUTE:", req.params.id);
+    try {
+        const listing = await Listing.findById(id);
+        if (!listing) {
+            console.log("❌ Listing not found.");
+            req.flash("error", "Listing not found.");
+            return res.redirect("/listing");
+        }
+        console.log("✅ Rendering edit form...");
+        res.render("listing/edit", { listing }); // ✅ make sure it's called 'listing' here
+    } catch (e) {
+        console.log("❌ Error in renderEditForm:", e);
+        req.flash("error", "Error fetching listing to edit.");
+        // res.redirect("/listing");
+        res.redirect("/");
 
-    if (!editList) {
-        req.flash("error", "Does not exist this listing");
+    }
+};
+
+
+// // // In your controller where you're handling the POST request for editing
+// // module.exports.updateListing = async (req, res) => {
+// //     const { id } = req.params;
+// //     const updatedData = req.body.listing;
+
+// //     if (!updatedData) {
+// //         req.flash("error", "'listing' data missing in request.");
+// //         return res.redirect(`/listing/${id}/edit`);
+// //     }
+
+// //     try {
+// //         const listing = await Listing.findByIdAndUpdate(id, updatedData, { new: true });
+// //         req.flash("success", "Listing updated successfully.");
+// //         res.redirect(`/listing/${listing._id}`);
+// //     } catch (e) {
+// //         req.flash("error", "Update failed.");
+// //         res.redirect(`/listing/${id}/edit`);
+// //     }
+// // };
+module.exports.updateListing = async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body.listing;  // Now accessing data under the listing object
+    console.log("Body : ", req.body);  // To debug the form data
+
+    if (!updatedData) {
+        req.flash("error", "'listing' data missing in request.");
+        return res.redirect(`/listing/${id}/edit`);
+    }
+
+    try {
+        const listing = await Listing.findByIdAndUpdate(id, updatedData, { new: true });
+        req.flash("success", "Listing updated successfully.");
+        res.redirect(`/listing/${listing._id}`);
+    } catch (e) {
+        req.flash("error", "Update failed.");
+        res.redirect(`/listing/${id}/edit`);
+    }
+};
+
+
+
+
+
+// Delete a listing
+module.exports.deleteListing = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const listing = await Listing.findById(id);
+        if (!listing) {
+            req.flash("error", "Listing not found.");
+            return res.redirect("/listing");
+        }
+
+        // Delete the listing from the database
+        await Listing.findByIdAndDelete(id);
+        req.flash("success", "Listing deleted!");
+        res.redirect("/listing");
+    } catch (e) {
+        req.flash("error", "Failed to delete the listing.");
         res.redirect("/listing");
     }
-
-    let originalImageUrl = editList.image.url;
-    originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250")
-    res.render("listing/edit.ejs", { editList, originalImageUrl });
-}
-
-
-module.exports.updateListing = async (req, res) => {
-    let { id } = req.params;
-    let editedList = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-
-    if (typeof req.file !== "undefined") {
-        let url = req.file.path;
-        let filename = req.file.filename;
-        editedList.image = { url, filename };
-        await editedList.save();
-    }
-
-    req.flash("success", "Listing updated")
-    res.redirect(`/listing/${id}`);
-}
-
-module.exports.deleteListing = async (req, res) => {
-    let { id } = req.params;
-    let deleteList = await Listing.findByIdAndDelete(id);
-    // console.log(deleteList);
-
-    req.flash("success", "Listing is deleted");
-    res.redirect("/listing");
-}
+};

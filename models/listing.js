@@ -1,3 +1,4 @@
+// // // // // // in models listing.js
 const mongoose = require('mongoose');
 const Review = require("./review.js");
 
@@ -15,8 +16,12 @@ const listingSchema = new mongoose.Schema({
         //     v === "" ? "https://media.istockphoto.com/id/517188688/photo/mountain-landscape.jpg?s=612x612&w=0&k=20&c=A63koPKaCyIwQWOTFBRWXj_PwCrR4cEoOw2S9Q7yVl8="
         //         : v,
 
-        url: String,
+        url: {
+            type: String,
+            default: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8aG90ZWxzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",  // Optional default image URL
+        },
         filename: String,
+
 
     },
     price: Number,
@@ -36,11 +41,11 @@ const listingSchema = new mongoose.Schema({
         type: {
             type: String, // Don't do `{ location: { type: String } }`
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: true
+            // required: true
         },
         coordinates: {
             type: [Number],
-            required: true
+            // required: true
         },
         category: {
             type: String,

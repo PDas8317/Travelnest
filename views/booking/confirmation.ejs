@@ -1,0 +1,26 @@
+<!-- views/booking/confirmation.ejs -->
+<h1>Booking Confirmation</h1>
+<p>Thank you for your booking!</p>
+
+<h3>Booking Details:</h3>
+<ul>
+    <li><strong>Listing:</strong>
+        <%= booking.listing.title %>
+    </li>
+    <li><strong>Package Type:</strong>
+        <%= booking.packageType %>
+    </li>
+    <li><strong>Check-in Date:</strong>
+        <%= new Date(booking.checkInDate).toLocaleDateString() %>
+    </li>
+    <li><strong>Check-out Date:</strong>
+        <%= new Date(booking.checkOutDate).toLocaleDateString() %>
+    </li>
+    <li><strong>Total Price:</strong> $<%= booking.totalPrice %>
+    </li>
+    <li><strong>Guests:</strong>
+        <%= booking.adults %> Adults, <%= booking.children %> Children
+    </li>
+</ul>
+
+<p><a href="/booking/history">Go to Booking History</a></p>

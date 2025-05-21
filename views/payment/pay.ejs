@@ -1,0 +1,17 @@
+<% layout('/layouts/boilerplate') %>
+
+    <h1>Payment Page</h1>
+    <p>Booking: <%= booking._id %>
+    </p>
+    <p>Listing Title: <%= booking.listing.title %>
+    </p>
+    <p>Total Price: ₹<%= booking.totalPrice %>
+    </p>
+    <p>Your Balance: ₹<%= userBalance %>
+    </p>
+
+    <form method="POST" action="/booking/payment/<%= booking._id %>">
+        <label>Enter PIN to pay:</label>
+        <input type="password" name="pin" required />
+        <button type="submit">Pay Now</button>
+    </form>

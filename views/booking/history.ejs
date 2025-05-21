@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Booking History</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #222;
+        }
+
+        .booking-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .booking-card {
+            background: white;
+            width: 320px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .booking-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .booking-content {
+            padding: 15px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .booking-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #0077cc;
+        }
+
+        .booking-detail {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .status-active {
+            color: green;
+            font-weight: 600;
+        }
+
+        .status-cancelled {
+            color: red;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 10px 0;
+            margin-top: auto;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            user-select: none;
+            text-decoration: none;
+            display: block;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .expired-msg {
+            margin-top: auto;
+            font-style: italic;
+            color: #888;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .no-bookings {
+            text-align: center;
+            font-size: 1.1em;
+            color: #555;
+            margin-top: 50px;
+        }
+
+        /* Modal styles */
+        #confirmModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #confirmModal.active {
+            display: flex;
+        }
+
+        #confirmModal>div {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #confirmModal h2 {
+            margin-top: 0;
+        }
+
+        #modalConfirmBtn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #modalCancelBtn {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        /* Button styling */
+        .toggle-btn {
+            background-color: #1f2937;
+            color: #fff;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background-color: #3b82f6;
+        }
+
+        /* Example card style adjustments */
+        .booking-card {
+            background: #fff;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode .booking-card {
+            background: #1e293b;
+            color: #e0e0e0;
+        }
+
+        .status-active {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        body.dark-mode .status-active {
+            color: #86efac;
+        }
+
+        .status-cancelled {
+            color: #f87171;
+            font-weight: 600;
+        }
+
+        body.dark-mode .status-cancelled {
+            color: #fca5a5;
+        }
+
+
+        /* Title animation for dark mode */
+        @keyframes colorCycle {
+            0% {
+                color: #ff6b6b;
+            }
+
+            25% {
+                color: #feca57;
+            }
+
+            50% {
+                color: #48dbfb;
+            }
+
+            75% {
+                color: #1dd1a1;
+            }
+
+            100% {
+                color: #ff6b6b;
+            }
+        }
+
+        .dark-mode h1 {
+            animation: colorCycle 5s infinite;
+            transition: color 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Flex container for the 3 elements -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 0 20px; flex-wrap: wrap;">
+
+
+        <a href="/listing"
+            style="text-decoration: none; padding: 10px 20px; background-color: #0077cc; color: white; border-radius: 5px; font-weight: bold;">
+            <i class="fas fa-home" style="margin-right: 8px;"></i> Home
+        </a>
+
+
+
+        <!-- Page Title -->
+        <h1 style="margin: 0; text-align: center;">Your Booking History</h1>
+
+        <!-- Dark Mode Button -->
+        <button id="darkModeToggle" class="toggle-btn">Dark Mode</button>
+
+    </div>
+
+
+
+
+
+
+
+
+    <% if (!bookings || bookings.length===0) { %>
+        <p class="no-bookings">You have no bookings yet.</p>
+        <% } else { %>
+            <div class="booking-list">
+                <% bookings.slice().reverse().forEach(function (booking) { %>
+                    <div class="booking-card">
+
+
+
+
+                        <p class="booking-detail"><strong>Booked On:</strong>
+                            <%= booking.bookingDate ? booking.bookingDate.toLocaleString() : "N/A" %>
+                        </p>
+
+
+
+
+                        <% if (booking.listing && booking.listing.image && booking.listing.image.url) { %>
+                            <img src="<%= booking.listing.image.url %>"
+                                alt="<%= booking.listing ? booking.listing.title : 'Listing Image' %>"
+                                class="booking-image" loading="lazy" />
+                            <% } else { %>
+                                <img src="https://via.placeholder.com/320x180?text=No+Image" alt="No Image Available"
+                                    class="booking-image" loading="lazy" />
+                                <% } %>
+
+                                    <div class="booking-content">
+                                        <h2 class="booking-title">
+                                            <%= booking.listing ? booking.listing.title : "Listing Removed" %>
+                                        </h2>
+
+                                        <p class="booking-detail"><strong>Package:</strong>
+                                            <%= booking.packageType %>
+                                        </p>
+
+                                        <p class="booking-detail"><strong>Check-In:</strong>
+                                            <%= booking.checkInDate ? booking.checkInDate.toDateString() : "N/A" %>
+                                        </p>
+
+                                        <p class="booking-detail"><strong>Check-Out:</strong>
+                                            <%= booking.checkOutDate ? booking.checkOutDate.toDateString() : "N/A" %>
+                                        </p>
+
+                                        <p class="booking-detail"><strong>Total Price:</strong> ₹<%= booking.totalPrice
+                                                %>
+                                        </p>
+
+                                        <p class="booking-detail"><strong>Status:</strong>
+                                            <% if (booking.canceled) { %>
+                                                <span class="status-cancelled">Cancelled</span>
+                                                <% } else { %>
+                                                    <span class="status-active">Active</span>
+                                                    <% } %>
+                                        </p>
+
+                                        <% if (!booking.canceled) { const diffDays=Math.floor((new Date() - new
+                                            Date(booking.bookingDate)) / (1000 * 60 * 60 * 24)); %>
+                                            <% if (diffDays <=7) { %>
+                                                <form method="GET" action="/booking/cancel/<%= booking._id %>"
+                                                    class="cancel-form"
+                                                    data-title="<%= booking.listing ? booking.listing.title : 'Listing Removed' %>"
+                                                    data-package="<%= booking.packageType %>"
+                                                    data-checkin="<%= booking.checkInDate ? booking.checkInDate.toDateString() : 'N/A' %>"
+                                                    data-checkout="<%= booking.checkOutDate ? booking.checkOutDate.toDateString() : 'N/A' %>"
+                                                    data-price="<%= booking.totalPrice %>"
+                                                    data-refundable="<%= Math.round(booking.totalPrice * 0.9) %>">
+                                                    <button type="submit" class="cancel-btn">Cancel Booking</button>
+                                                </form>
+                                                <% } else { %>
+                                                    <p class="expired-msg">Cancellation period expired.</p>
+                                                    <% } %>
+                                                        <% } else { %>
+                                                            <p class="expired-msg">Booking has been cancelled.</p>
+                                                            <% } %>
+                                    </div>
+                    </div>
+                    <% }); %>
+            </div>
+            <% } %>
+
+                <!-- Confirmation Modal -->
+                <div id="confirmModal">
+                    <div>
+                        <h2>Confirm Cancellation</h2>
+                        <p id="modalBookingDetails"></p>
+                        <p><strong>Refund Policy:</strong> Refundable after cancellation.</p>
+                        <p>Are you sure you want to cancel this booking?</p>
+                        <button id="modalConfirmBtn">Yes, Cancel</button>
+                        <button id="modalCancelBtn">No, Keep Booking</button>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const modal = document.getElementById('confirmModal');
+                        const modalDetails = document.getElementById('modalBookingDetails');
+                        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+                        const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+                        let formToSubmit = null;
+
+                        // Attach event listeners to cancel forms
+                        document.querySelectorAll('form.cancel-form').forEach(form => {
+                            form.addEventListener('submit', e => {
+                                e.preventDefault();
+
+                                formToSubmit = form;
+
+                                // Fetch booking data from data attributes
+                                const title = form.dataset.title || 'N/A';
+                                const packageType = form.dataset.package || 'N/A';
+                                const checkIn = form.dataset.checkin || 'N/A';
+                                const checkOut = form.dataset.checkout || 'N/A';
+                                const price = form.dataset.price || 'N/A';
+                                const refundable = form.dataset.refundable || 'N/A';
+
+                                // Set modal details content
+                                modalDetails.innerHTML = `
+                        <strong>Listing:</strong> ${title}<br/>
+                        <strong>Package:</strong> ${packageType}<br/>
+                        <strong>Check-In:</strong> ${checkIn}<br/>
+                        <strong>Check-Out:</strong> ${checkOut}<br/>
+                        <strong>Total Price Paid:</strong> ₹${price}<br/>
+                        <strong>Refundable Amount:</strong> ₹${refundable}
+                    `;
+
+                                // Show the modal
+                                modal.classList.add('active');
+                            });
+                        });
+
+                        // Confirm cancellation
+                        modalConfirmBtn.addEventListener('click', () => {
+                            if (formToSubmit) {
+                                formToSubmit.submit();
+                            }
+                        });
+
+                        // Cancel modal
+                        modalCancelBtn.addEventListener('click', () => {
+                            modal.classList.remove('active');
+                            formToSubmit = null;
+                        });
+
+                        // Optional: close modal on clicking outside modal content
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                modal.classList.remove('active');
+                                formToSubmit = null;
+                            }
+                        });
+                    });
+                </script>
+
+                <script>
+                    const toggleBtn = document.getElementById('darkModeToggle');
+                    toggleBtn.addEventListener('click', () => {
+                        document.body.classList.toggle('dark-mode');
+                    });
+                </script>
+
+</body>
+
+</html>
